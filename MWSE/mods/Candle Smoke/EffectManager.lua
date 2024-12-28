@@ -1,7 +1,7 @@
 local inspect = require("inspect")
 local log = require("logging.logger").getLogger("Candle Smoke") --[[@as mwseLogger]]
 
-local Class = require("livecoding.Class")
+local Class = require("Candle Smoke.Class")
 local config = require("Candle Smoke.config").config
 local smokeOffset = require("Candle Smoke.data").smokeOffset
 local util = require("Candle Smoke.util")

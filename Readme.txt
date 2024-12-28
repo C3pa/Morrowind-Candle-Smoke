@@ -1,7 +1,7 @@
 				Candle Smoke
 				By C3pa
 
-Version: 1.0.0
+Version: 1.0.1
 
 _________
 Contents
@@ -38,6 +38,8 @@ Changelog
 ____________
 1.0.0
 Initial Release.
+1.0.1
+Bugfix: Fix an error that prevents the mod from working.
 
 ________
 Contact
