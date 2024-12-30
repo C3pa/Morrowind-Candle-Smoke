@@ -31,16 +31,23 @@ local function onItemDropped(e)
 end
 event.register(tes3.event.itemDropped, onItemDropped)
 
--- Remove smoke effect if a candle is picked up.
----@param e activateEventData
-local function onActivate(e)
-	effectManager:detachSmokeEffect(e.target, true)
-end
-event.register(tes3.event.activate, onActivate, { priority = -2000 })
 
--- Some safety cleanup
----@param e referenceDeactivatedEventData
-local function onReferenceDeactivated(e)
-	effectManager:detachSmokeEffect(e.reference, true)
+---@param e MidnightOil.LightToggleEventData
+local function onToggleOn(e)
+	effectManager:applyCandleSmokeEffect(e.reference, true)
 end
-event.register(tes3.event.referenceDeactivated, onReferenceDeactivated)
+-- Compatibility with lights tuggles on/off with Midnight Oil
+event.register("MidnightOil:TurnedLightOn", onToggleOn)
+
+
+---@param e referenceDeactivatedEventData|activateEventData|MidnightOil.LightToggleEventData
+local function removeSmoke(e)
+	local reference = e.reference or e.target
+	effectManager:detachSmokeEffect(reference, true)
+end
+-- Remove smoke effect if a candle is picked up.
+event.register(tes3.event.activate, removeSmoke, { priority = -2000 })
+-- Some safety cleanup
+event.register(tes3.event.referenceDeactivated, removeSmoke)
+-- Compatibility with lights turned of with Midnight Oil
+event.register("MidnightOil:RemovedLight", removeSmoke)

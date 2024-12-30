@@ -9,7 +9,11 @@ function util.getLights()
 	for _, cell in ipairs(tes3.getActiveCells()) do
 		for ref in cell:iterateReferences() do
 			local object = ref.object
-			if object.objectType == tes3.objectType.light and not object.isOffByDefault then
+
+			-- Make sure not to include disabled/deleted lights. These frequently
+			-- result from light toggling on/off with Midnight Oil.
+			if object.objectType == tes3.objectType.light and not object.isOffByDefault
+				and not ref.disabled and not ref.deleted then
 				local mesh = util.sanitizeMesh(object.mesh)
 				if smokeOffset[mesh] then
 					table.insert(candles, ref)

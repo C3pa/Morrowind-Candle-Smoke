@@ -77,13 +77,22 @@ function EffectManager:spawnSmokeVFX(light, offsets, updateRoot)
 	util.updateVFXRoot()
 end
 
----@private
 ---@param reference tes3reference
 ---@param updateRoot boolean?
 ---@return boolean spawnedSmoke
 function EffectManager:applyCandleSmokeEffect(reference, updateRoot)
 	local light = reference.object --[[@as tes3light]]
 	if config.disableCarriable and light.canCarry then
+		return false
+	end
+
+	-- Compatibility with Midnight Oil
+	if reference.supportsLuaData and reference.data.lightTurnedOff then
+		return false
+	end
+
+	-- Don't apply the effect twice.
+	if self.activeEffects[light] then
 		return false
 	end
 
@@ -140,8 +149,6 @@ function EffectManager:onCellChange()
 	end
 
 	self:applySmokeOnAllCandles()
-	util.updateVFXRoot()
-
 	log:trace("cellEffectsUpdate: after activeEffects = %s", inspect(self.activeEffects))
 end
 

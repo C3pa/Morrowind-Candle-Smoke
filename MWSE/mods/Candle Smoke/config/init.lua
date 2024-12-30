@@ -10,7 +10,7 @@ local default = {
 
 local cachedConfig = mwse.loadConfig(configFile, default)
 local this = {
-	version = "1.0.1",
+	version = "1.1.0",
 	---@type CandleSmoke.configTable
 	config = {}, --- @diagnostic disable-line: missing-fields
 	default = default,
