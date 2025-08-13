@@ -1,9 +1,8 @@
-local configlib = require("Candle Smoke.config")
-local log = require("logging.logger").getLogger("Candle Smoke") --[[@as mwseLogger]]
+local config = require("Candle Smoke.config")
 
 
 local i18n = mwse.loadTranslations("Candle Smoke")
-local mcmConfig = configlib.getConfig()
+local log = mwse.Logger.new()
 
 local authors = {
 	{
@@ -38,14 +37,12 @@ local function registerModConfig()
 	local template = mwse.mcm.createTemplate({
 		name = i18n("Candle Smoke"),
 		headerImagePath = "MWSE/mods/Candle Smoke/mcm/Header.tga",
-		onClose = function()
-			configlib.saveConfig(mcmConfig)
-		end,
-		config = mcmConfig,
-		defaultConfig = configlib.default,
+		config = config,
+		defaultConfig = config.default,
 		showDefaultSetting = true,
 	})
 	template:register()
+	template:saveOnClose(config.fileName, config)
 
 	local page = template:createSideBarPage({
 		label = i18n("mcm.settings"),
@@ -71,21 +68,8 @@ local function registerModConfig()
 		configKey = "disableCarriable",
 	})
 
-	page:createDropdown({
-		label = i18n("mcm.logLevel.label"),
-		description = i18n("mcm.logLevel.description"),
-		options = {
-			{ label = "Trace", value = "TRACE" },
-			{ label = "Debug", value = "DEBUG" },
-			{ label = "Info",  value = "INFO" },
-			{ label = "Warn",  value = "WARN" },
-			{ label = "Error", value = "ERROR" },
-			{ label = "None",  value = "NONE" },
-		},
-		configKey = "logLevel",
-		callback = function(self)
-			log:setLogLevel(self.variable.value)
-		end
+	page:createLogLevelOptions({
+		configKey = "logLevel"
 	})
 end
 

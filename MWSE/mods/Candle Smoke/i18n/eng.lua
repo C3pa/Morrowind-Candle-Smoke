@@ -29,9 +29,5 @@ return {
 			["label"] = "Disable for carriable candles",
 			["description"] = "If disabled, carriable candles won't have the smoke effect applied.",
 		},
-		["logLevel"] = {
-			["label"] = "Logging Level",
-			["description"] = "Set the log level. If you've found a bug in the mod, please backup your MWSE.log, set the logging level to Trace, and replicate the bug. When reporting the bug please attach both MWSE.log files.",
-		},
 	},
 }

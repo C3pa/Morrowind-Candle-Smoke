@@ -1,9 +1,7 @@
-local logger = require("logging.logger")
+local config = require("Candle Smoke.config")
+local util = require("Candle Smoke.util")
 
--- We directly index into the "config" table in the configlib module.
-local config = require("Candle Smoke.config").config
-
-local log = logger.new({
+local log = mwse.Logger.new({
 	name = "Candle Smoke",
 	logLevel = config.logLevel,
 })
