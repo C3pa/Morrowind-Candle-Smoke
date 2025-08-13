@@ -19,7 +19,6 @@ https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df440
 
 
 local BASEPATH = "e\\taitech\\candlesmoke%d_%d.nif"
-local MAX_SMOKE_DISTANCE = 8192 * 1.5 -- Cell and a half
 local OFFSET = tes3vector3.new(0, 0, -2)
 
 -- A cache of loaded smoke effect meshes
@@ -129,13 +128,7 @@ end
 ---@param updateRoot boolean?
 ---@return boolean spawnedSmoke
 function EffectManager:applyCandleSmokeEffect(reference, updateRoot)
-	local light = reference.object --[[@as tes3light]]
-	if config.disableCarriable and light.canCarry then
-		return false
-	end
-
-	-- Compatibility with Midnight Oil
-	if reference.supportsLuaData and reference.data.lightTurnedOff then
+	if not util.isLanternValid(reference) then
 		return false
 	end
 
@@ -143,7 +136,7 @@ function EffectManager:applyCandleSmokeEffect(reference, updateRoot)
 	if self.activeEffects[reference] then
 		return false
 	end
-
+	local light = reference.object --[[@as tes3light]]
 	local mesh = util.sanitizeMesh(light.mesh)
 	local offsets = smokeOffset[mesh]
 	return self:spawnSmokeVFX(reference, offsets, updateRoot)
@@ -151,7 +144,7 @@ end
 
 ---@private
 function EffectManager:applySmokeOnAllCandles()
-	for _, light in ipairs(util.getLights() or {}) do
+	for _, light in ipairs(util.getLights()) do
 		self:applyCandleSmokeEffect(light)
 	end
 	util.updateVFXRoot()
@@ -180,24 +173,10 @@ function EffectManager:detachAllSmokeEffects()
 	util.updateVFXRoot()
 end
 
-function EffectManager:onCellChange()
-	log:trace("cellEffectsUpdate: before activeEffects = %s", inspect(self.activeEffects))
-	-- New cell is an interior? It's enough to remove all the smoke from candles
-	-- in the previous cell and apply smoke to candles in this cell.
-	if tes3.player.cell.isInterior then
-		self:detachAllSmokeEffects()
-	else
-		-- TODO: remove distance culling, the effect is already behind a LOD node
-		-- When transitioning exterior -> exterior cell, we disable smoke effect based on distance.
-		for light, _ in pairs(self.activeEffects) do
-			if light.position:distanceXY(tes3.player.position) > MAX_SMOKE_DISTANCE then
-				self:detachSmokeEffect(light)
-			end
-		end
-	end
-
+function EffectManager:onCellChanged()
+	log:trace("onCellChanged: before activeEffects = %s", inspect(self.activeEffects))
 	self:applySmokeOnAllCandles()
-	log:trace("cellEffectsUpdate: after activeEffects = %s", inspect(self.activeEffects))
+	log:trace("onCellChanged: after activeEffects = %s", inspect(self.activeEffects))
 end
 
 -- Apply smoke effect if the player dropped a candle

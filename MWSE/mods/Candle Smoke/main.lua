@@ -16,6 +16,8 @@ local EffectManager = require("Candle Smoke.EffectManager")
 
 local effectManager = EffectManager:new()
 
+
+
 ---@param e candleSmoke.EmissiveColorChangedEventData
 local function onEmissiveColorChanged(e)
 	timer.delayOneFrame(function()
@@ -29,17 +31,25 @@ local function updateSmokeEffectFrameAfter()
 	timer.delayOneFrame(function(e)
 		-- effectManager:updateEffectMaterialColor(util.getSmokeEmissiveColor())
 		effectManager:updateEffectMaterial(config.alpha)
-		effectManager:onCellChange()
+		effectManager:onCellChanged()
 	end)
 end
 event.register("Candle Smoke: update effects", updateSmokeEffectFrameAfter)
 
-local function updateSmokeEffect()
-	-- effectManager:updateEffectMaterialColor(util.getSmokeEmissiveColor())
-	effectManager:updateEffectMaterial(config.alpha)
-	effectManager:onCellChange()
+
+
+
+
+
+
+
+
+
+
+local function onCellChanged()
+	effectManager:onCellChanged()
 end
-event.register(tes3.event.cellChanged, updateSmokeEffect)
+event.register(tes3.event.cellChanged, onCellChanged)
 
 -- Apply smoke effect if the player dropped a candle
 ---@param e itemDroppedEventData
@@ -63,8 +73,8 @@ local function removeSmoke(e)
 	effectManager:detachSmokeEffect(reference, true)
 end
 -- Remove smoke effect if a candle is picked up.
-event.register(tes3.event.activate, removeSmoke, { priority = -2000 })
--- Some safety cleanup
+event.register(tes3.event.activate, removeSmoke, { priority = -330 })
+-- Some safety cleanup.
 event.register(tes3.event.referenceDeactivated, removeSmoke)
--- Compatibility with lights turned of with Midnight Oil
+-- Compatibility with lights turned off with Midnight Oil.
 event.register("MidnightOil:RemovedLight", removeSmoke)
