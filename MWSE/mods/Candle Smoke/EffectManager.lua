@@ -56,9 +56,13 @@ end
 
 ---@private
 ---@param light tes3reference
----@param offsets tes3vector3[]
+---@param offsets tes3vector3[]?
 ---@param updateRoot boolean?
 function EffectManager:spawnSmokeVFX(light, offsets, updateRoot)
+	if not offsets then
+		log:info("No smoke offsets for %q.", light.mesh)
+		return false
+	end
 	local origin = light.position:copy()
 	local root = tes3.worldController.vfxManager.worldVFXRoot
 
@@ -109,8 +113,7 @@ function EffectManager:applyCandleSmokeEffect(reference, updateRoot)
 
 	local mesh = util.sanitizeMesh(light.mesh)
 	local offsets = smokeOffset[mesh]
-	self:spawnSmokeVFX(reference, offsets, updateRoot)
-	return true
+	return self:spawnSmokeVFX(reference, offsets, updateRoot)
 end
 
 ---@private
