@@ -7,6 +7,7 @@ local fileName = "Candle Smoke"
 local default = {
 	logLevel = mwse.logLevel.info,
 	smokeIntensity = 60,
+	alpha = 1.0,
 	disableCarriable = false,
 }
 

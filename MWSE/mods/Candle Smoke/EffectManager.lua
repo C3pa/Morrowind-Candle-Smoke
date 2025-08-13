@@ -55,6 +55,38 @@ function EffectManager:incrementPhase()
 end
 
 ---@private
+---@param node niNode
+---@param newAlpha number
+function EffectManager:setNodeMaterialAlpha(node, newAlpha)
+	-- -@param node niObjectNET
+	-- for node in table.traverse({ node }) do
+	-- 	if node:isInstanceOfType(ni.type.NiTriShape) then
+	-- 		log:debug("Changing color of %s", node.name)
+	-- 		---@cast node niTriShape
+	-- 		local material = node:detachProperty(ni.propertyType.material):clone() --[[@as niMaterialProperty]]
+	-- 		material.alpha = newAlpha
+	-- 		node:attachProperty(material)
+	-- 		node:updateProperties()
+	-- 	end
+	-- end
+end
+
+---@param newAlpha number
+function EffectManager:updateEffectMaterial(newAlpha)
+	log:debug("Setting new alpha to: %s", newAlpha)
+	-- for _, effects in pairs(self.activeEffects) do
+	-- 	for _, effect in pairs(effects) do
+	-- 		self:setNodeMaterialAlpha(effect, newAlpha)
+	-- 	end
+	-- end
+	-- -- Also update cached smoke effects
+	-- for _, effect in pairs(smokeEffects) do
+	-- 	self:setNodeMaterialAlpha(effect, newAlpha)
+	-- end
+	-- util.updateVFXRoot()
+end
+
+---@private
 ---@param light tes3reference
 ---@param offsets tes3vector3[]?
 ---@param updateRoot boolean?
@@ -78,6 +110,7 @@ function EffectManager:spawnSmokeVFX(light, offsets, updateRoot)
 			smokeEffects[path] = tes3.loadMesh(path) --[[@as niNode]]
 			effect = smokeEffects[path]
 			effect.name = path
+			self:setNodeMaterialAlpha(effect, config.alpha)--util.getSmokeEmissiveColor())
 		end
 
 		effect = effect:clone() --[[@as niNode]]
@@ -154,6 +187,7 @@ function EffectManager:onCellChange()
 	if tes3.player.cell.isInterior then
 		self:detachAllSmokeEffects()
 	else
+		-- TODO: remove distance culling, the effect is already behind a LOD node
 		-- When transitioning exterior -> exterior cell, we disable smoke effect based on distance.
 		for light, _ in pairs(self.activeEffects) do
 			if light.position:distanceXY(tes3.player.position) > MAX_SMOKE_DISTANCE then

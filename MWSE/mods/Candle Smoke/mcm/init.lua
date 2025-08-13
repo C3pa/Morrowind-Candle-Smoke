@@ -50,6 +50,21 @@ local function registerModConfig()
 	}) --[[@as mwseMCMSideBarPage]]
 	createSidebar(page)
 
+	---@class candleSmoke.EmissiveColorChangedEventData
+	---@field alpha number
+
+	page:createSlider({
+		label = i18n("mcm.smokeIntensity.label"),
+		description = i18n("mcm.smokeIntensity.description"),
+		decimalPlaces = 2,
+		max = 1.0,
+		jump = 0.01,
+		configKey = "alpha",
+		callback = function(self)
+			event.trigger("CandleSmoke:AlphaChanged", { alpha = self.variable.value })
+		end
+	})
+
 	page:createDropdown({
 		label = i18n("mcm.smokeIntensity.label"),
 		description = i18n("mcm.smokeIntensity.description"),

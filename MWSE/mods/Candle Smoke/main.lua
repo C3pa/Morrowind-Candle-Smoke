@@ -16,10 +16,29 @@ local EffectManager = require("Candle Smoke.EffectManager")
 
 local effectManager = EffectManager:new()
 
+---@param e candleSmoke.EmissiveColorChangedEventData
+local function onEmissiveColorChanged(e)
+	timer.delayOneFrame(function()
+		-- local color = { r = e.color, g = e.color, b = e.color }
+		effectManager:updateEffectMaterial(e.alpha)
+	end)
+end
+event.register("CandleSmoke:EmissiveColorChanged", onEmissiveColorChanged)
+
+local function updateSmokeEffectFrameAfter()
+	timer.delayOneFrame(function(e)
+		-- effectManager:updateEffectMaterialColor(util.getSmokeEmissiveColor())
+		effectManager:updateEffectMaterial(config.alpha)
+		effectManager:onCellChange()
+	end)
+end
+event.register("Candle Smoke: update effects", updateSmokeEffectFrameAfter)
+
 local function updateSmokeEffect()
+	-- effectManager:updateEffectMaterialColor(util.getSmokeEmissiveColor())
+	effectManager:updateEffectMaterial(config.alpha)
 	effectManager:onCellChange()
 end
-event.register("Candle Smoke: update effects", updateSmokeEffect)
 event.register(tes3.event.cellChanged, updateSmokeEffect)
 
 -- Apply smoke effect if the player dropped a candle

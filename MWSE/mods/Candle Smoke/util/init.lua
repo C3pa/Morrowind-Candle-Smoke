@@ -1,7 +1,12 @@
+local config = require("Candle Smoke.config")
 local smokeOffset = require("Candle Smoke.data").smokeOffset
 
-
 local util = {}
+
+function util.getSmokeEmissiveColor()
+	-- return niColor.new(config.smokeEmissive, config.smokeEmissive, config.smokeEmissive)
+	-- return { r = config.smokeEmissive, g = config.smokeEmissive, b = config.smokeEmissive }
+end
 
 function util.getLights()
 	---@type tes3reference[]
