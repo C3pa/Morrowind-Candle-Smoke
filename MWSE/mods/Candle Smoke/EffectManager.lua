@@ -8,6 +8,15 @@ local util = require("Candle Smoke.util")
 
 local log = mwse.Logger.new()
 
+-- TODO: try programatically making smoke more/less apparent
+--[[
+https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Ashfall%20-%20A%20Camping%20Survival%20and%20Needs%20Mod/Ashfall-49057-3-19-2-1733802884/Data%20Files/MWSE/mods/mer/ashfall/camping/campfire/campfireVisuals.lua#L280
+https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Inspect%20It/Inspect%20It-54636-1-7-1725378854/Data%20Files/MWSE/mods/InspectIt/controller/inspector.lua#L715
+https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Magicka%20Expanded/Magicka%20Expanded-47111-3-0-3-1719837299/00%20-%20Framework/MWSE/lib/OperatorJack/MagickaExpanded/vfx/nodes/decals.lua#L59
+https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Highlighter/Highlighter-55620-0-1-1734782876/Data%20Files/MWSE/mods/Highlighter/main.lua#L8
+
+--]]
+
 
 local BASEPATH = "e\\taitech\\candlesmoke%d_%d.nif"
 local MAX_SMOKE_DISTANCE = 8192 * 1.5 -- Cell and a half
@@ -94,7 +103,7 @@ function EffectManager:applyCandleSmokeEffect(reference, updateRoot)
 	end
 
 	-- Don't apply the effect twice.
-	if self.activeEffects[light] then
+	if self.activeEffects[reference] then
 		return false
 	end
 
