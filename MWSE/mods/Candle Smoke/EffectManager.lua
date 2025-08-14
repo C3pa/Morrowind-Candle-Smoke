@@ -16,12 +16,12 @@ local parentNodeName = {
 local loadedEffect = {}
 
 
----@class CandleSmoke.EffectManager
+---@class candleSmoke.EffectManager
 ---@field activeEffects table<tes3reference, niNode[]>
 ---@field phase integer
 local EffectManager = Class:new()
 
---- @return CandleSmoke.EffectManager
+--- @return candleSmoke.EffectManager
 function EffectManager:new()
 	local t = Class:new()
 	setmetatable(t, self)

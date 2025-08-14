@@ -1,7 +1,7 @@
 				Candle Smoke
 				By C3pa
 
-Version: 1.1.0
+Version: 2.0.0
 
 _________
 Contents
@@ -42,6 +42,9 @@ Initial Release.
 Bugfix: Fix an error that prevents the mod from working.
 1.1.0
 Compatibility: Fixed all the issues with Midnight Oil. Both mods are now compatible.
+2.0.0
+Feature: Added the ability to change the effect intensity using a slider.
+Bugfix: Fix an error that appeared when using this mod together with Midnight Oil.
 
 ________
 Contact
