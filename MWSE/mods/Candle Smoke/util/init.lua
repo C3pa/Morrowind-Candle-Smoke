@@ -52,7 +52,11 @@ function util.isLanternValid(ref)
 		return false
 	end
 
-	local light = ref.object --[[@as tes3light]]
+	local light = ref.object
+	if light.objectType ~= tes3.objectType.light then
+		return false
+	end
+	---@cast light tes3light
 	if config.disableCarriable and light.canCarry then
 		return false
 	end

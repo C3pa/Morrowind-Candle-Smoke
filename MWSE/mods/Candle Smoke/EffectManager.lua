@@ -1,5 +1,3 @@
-local inspect = require("inspect")
-
 local Class = require("Candle Smoke.Class")
 local util = require("Candle Smoke.util")
 
@@ -64,7 +62,7 @@ end
 
 ---@private
 ---@param light tes3reference
-function EffectManager:spawnSmokeVFX(light)
+function EffectManager:spawnVFX(light)
 	for node in table.traverse({ light.sceneNode }) do
 		if parentNodeName[node.name] then
 			local path = string.format(BASEPATH, self:incrementPhase())
@@ -100,11 +98,10 @@ function EffectManager:applyCandleSmokeEffect(reference)
 		return false
 	end
 
-	self:spawnSmokeVFX(reference)
+	self:spawnVFX(reference)
 	return true
 end
 
----@private
 function EffectManager:applySmokeOnAllCandles()
 	for _, light in ipairs(util.getLights()) do
 		self:applyCandleSmokeEffect(light)
@@ -122,29 +119,6 @@ function EffectManager:detachSmokeEffect(light)
 	end
 	util.updateNode(light.sceneNode)
 	self.activeEffects[light] = nil
-end
-
----@private
-function EffectManager:detachAllSmokeEffects()
-	for light, _ in pairs(self.activeEffects) do
-		self:detachSmokeEffect(light)
-	end
-end
-
-function EffectManager:onCellChanged()
-	log:trace("onCellChanged: before activeEffects = %s", inspect(self.activeEffects))
-	self:applySmokeOnAllCandles()
-	log:trace("onCellChanged: after activeEffects = %s", inspect(self.activeEffects))
-end
-
--- Apply smoke effect if the player dropped a candle
--- TODO: remove
----@param e itemDroppedEventData
-function EffectManager:onItemDropped(e)
-	local ref = e.reference
-	local object = ref.object
-	if object.objectType ~= tes3.objectType.light then return end
-	self:applyCandleSmokeEffect(ref)
 end
 
 return EffectManager

@@ -23,24 +23,18 @@ end
 event.register("Candle Smoke: intensity updated", updateIntensity)
 
 local function onCellChanged()
-	effectManager:onCellChanged()
+	effectManager:applySmokeOnAllCandles()
 end
 event.register(tes3.event.cellChanged, onCellChanged)
 
--- Apply smoke effect if the player dropped a candle
----@param e itemDroppedEventData
-local function onItemDropped(e)
-	effectManager:onItemDropped(e)
-end
-event.register(tes3.event.itemDropped, onItemDropped)
-
-
----@param e MidnightOil.LightToggleEventData
-local function onToggleOn(e)
+---@param e MidnightOil.LightToggleEventData|itemDroppedEventData
+local function onLightSpawned(e)
 	effectManager:applyCandleSmokeEffect(e.reference)
 end
 -- Compatibility with lights tuggles on/off with Midnight Oil
-event.register("MidnightOil:TurnedLightOn", onToggleOn)
+event.register("MidnightOil:TurnedLightOn", onLightSpawned)
+-- Apply smoke effect if the player dropped a candle
+event.register(tes3.event.itemDropped, onLightSpawned)
 
 
 ---@param e referenceDeactivatedEventData|activateEventData|MidnightOil.LightToggleEventData
