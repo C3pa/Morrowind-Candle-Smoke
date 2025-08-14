@@ -44,6 +44,7 @@ Bugfix: Fix an error that prevents the mod from working.
 Compatibility: Fixed all the issues with Midnight Oil. Both mods are now compatible.
 2.0.0
 Feature: Added the ability to change the effect intensity using a slider.
+Feature: Added support for 26 more candles from Skyrim Home of the Nords and Project Cyrodiil
 Bugfix: Fix an error that appeared when using this mod together with Midnight Oil.
 
 ________

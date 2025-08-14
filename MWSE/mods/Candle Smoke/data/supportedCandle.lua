@@ -1,5 +1,6 @@
 -- A list of all the supported candle meshes.
 return {
+	-- Morrowind
 	["light_6th_candle_01.nif"] = true,
 	["light_6th_candle_02.nif"] = true,
 	["light_6th_candle_03.nif"] = true,
@@ -83,7 +84,21 @@ return {
 	["tr_l_de_g_candlered.nif"] = true,
 	["tr_l_de_g_candlewhite.nif"] = true,
 
+	-- SHOTN
+	["sky_lgt_nord_scnb_01.nif"] = true,
+	["sky_lgt_nord_scnb_02.nif"] = true,
+	["sky_light_nord_lat_03.nif"] = true,
+	["sky_light_nord_lat_04.nif"] = true,
+	["sky_lgt_nord_cdst_01.nif"] = true,
+	["sky_lgt_nord_csdc01.nif"] = true,
+
 	-- Project Cyrodiil
+	["hr_l_gglass_cnd_01gre.nif"] = true,
+	["hr_l_gglass_cnd_01pur.nif"] = true,
+	["hr_l_gglass_cnd_01purp.nif"] = true,
+	["hr_l_gglass_cnd_01whi.nif"] = true,
+	["hr_l_gglass_cnd_01blu.nif"] = true,
+	["hr_l_gglass_cnd_01blub.nif"] = true,
 	["pc_candle_blck01.nif"] = true,
 	["pc_candle_blck02.nif"] = true,
 	["pc_candle_blck03.nif"] = true,
@@ -136,6 +151,20 @@ return {
 	["pc_com_lamp_02_blueB.nif"] = true,
 	["pc_com_lamp_02_red.nif"] = true,
 	["pc_com_lamp_02_redR.nif"] = true,
+	["pc_l_gld_cndl1_w01.nif"] = true,
+	["pc_l_gld_cndl2_w01.nif"] = true,
+	["pc_rga_brlamp_01.nif"] = true,
+	["pc_rga_burner_01.nif"] = true,
+	["pc_rga_burner_02.nif"] = true,
+	["pc_rga_burner_w_01.nif"] = true,
+	["pc_rga_burner_w_02.nif"] = true,
+	["pi_l_coco_lanternred.nif"] = true,
+	["pi_l_coco_lanternredr.nif"] = true,
+	["pi_l_coco_lanternwhi.nif"] = true,
+	["pi_l_coco_lanternyel.nif"] = true,
+	["pi_l_coco_lanternblu.nif"] = true,
+	["pi_l_coco_lanternblub.nif"] = true,
+	["pi_l_coco_lanterngre.nif"] = true,
 
 	-- OAAB
 	["meshes/oaab/l/pc_candle_blck03.nif"] = true,
