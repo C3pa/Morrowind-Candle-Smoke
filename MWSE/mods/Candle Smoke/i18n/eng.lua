@@ -18,12 +18,8 @@ return {
 
 		-- Strings for inidividual settings:
 		["smokeIntensity"] = {
-			["label"] = "Smoke density and glow strength",
+			["label"] = "Effect intensity",
 			["description"] = "You can increase or decrease smoke effect visibility.",
-			["Very faint"] = "Very faint",
-			["Faint"] = "Faint",
-			["Medium"] = "Medium",
-			["Dense"] = "Dense",
 		},
 		["disableCarriable"] = {
 			["label"] = "Disable for carriable candles",

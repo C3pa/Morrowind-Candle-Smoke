@@ -1,5 +1,5 @@
 local data = {}
 
-data.smokeOffset = require("Candle Smoke.data.smokeOffset")
+data.supported = require("Candle Smoke.data.supportedCandle")
 
 return data

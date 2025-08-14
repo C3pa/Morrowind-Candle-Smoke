@@ -1,5 +1,5 @@
 local config = require("Candle Smoke.config")
-local smokeOffset = require("Candle Smoke.data").smokeOffset
+local supported = require("Candle Smoke.data").supported
 
 local util = {}
 
@@ -10,6 +10,13 @@ function util.getEmissiveColorFromConfig()
 		g = config.intensity,
 		b = config.intensity
 	}
+end
+
+---@param node niNode
+function util.updateNode(node)
+	node:update()
+	node:updateEffects()
+	node:updateProperties()
 end
 
 ---@param node niNode
@@ -25,25 +32,10 @@ function util.updateNodeEmissive(node, color)
 	end
 end
 
-function util.getLights()
-	---@type tes3reference[]
-	local candles = {}
-	for _, cell in ipairs(tes3.getActiveCells()) do
-		for ref in cell:iterateReferences() do
-			local object = ref.object
-
-			-- Make sure not to include disabled/deleted lights. These frequently
-			-- result from light toggling on/off with Midnight Oil.
-			if object.objectType == tes3.objectType.light and not object.isOffByDefault
-				and not ref.disabled and not ref.deleted then
-				local mesh = util.sanitizeMesh(object.mesh)
-				if smokeOffset[mesh] then
-					table.insert(candles, ref)
-				end
-			end
-		end
-	end
-	return candles
+-- Let's strip the beginning "l\"
+---@param meshPath string
+function util.sanitizeMesh(meshPath)
+	return string.sub(string.lower(meshPath), 3)
 end
 
 -- Compatibility with Midnight Oil
@@ -74,22 +66,33 @@ function util.isLanternValid(ref)
 		return false
 	end
 
-	-- local mesh = string.lower(light.mesh)
-	-- return (lanterns[mesh] or config.whitelist[mesh]) or false
+	local mesh = util.sanitizeMesh(light.mesh)
+	if not supported[mesh] then
+		return false
+	end
+
 	return true
 end
 
----@param node niNode
-function util.updateNode(node)
-	node:update()
-	node:updateEffects()
-	node:updateProperties()
-end
+function util.getLights()
+	---@type tes3reference[]
+	local candles = {}
+	for _, cell in ipairs(tes3.getActiveCells()) do
+		for ref in cell:iterateReferences() do
+			local object = ref.object
 
--- Let's strip the beginning "l\"
----@param meshPath string
-function util.sanitizeMesh(meshPath)
-	return string.sub(string.lower(meshPath), 3)
+			-- Make sure not to include disabled/deleted lights. These frequently
+			-- result from light toggling on/off with Midnight Oil.
+			if object.objectType == tes3.objectType.light and not object.isOffByDefault
+				and not ref.disabled and not ref.deleted then
+				local mesh = util.sanitizeMesh(object.mesh)
+				if supported[mesh] then
+					table.insert(candles, ref)
+				end
+			end
+		end
+	end
+	return candles
 end
 
 return util

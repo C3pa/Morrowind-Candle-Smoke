@@ -22,9 +22,6 @@ local function updateIntensity()
 end
 event.register("Candle Smoke: intensity updated", updateIntensity)
 
-
-
-
 local function onCellChanged()
 	effectManager:onCellChanged()
 end

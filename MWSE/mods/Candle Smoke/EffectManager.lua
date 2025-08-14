@@ -1,14 +1,17 @@
 local inspect = require("inspect")
 
 local Class = require("Candle Smoke.Class")
-local smokeOffset = require("Candle Smoke.data").smokeOffset
 local util = require("Candle Smoke.util")
 
 
 local log = mwse.Logger.new()
 local BASEPATH = "e\\taitech\\candlesmoke_%d.nif"
 local OFFSET = tes3vector3.new(0, 0, -2)
-local parentNodeName = "CandleFlame Emitter"
+local parentNodeName = {
+	["RedCandleFlame Emitter"] = true,
+	["BlueCandleFlame Emitter"] = true,
+	["CandleFlame Emitter"] = true
+}
 
 -- A cache of loaded smoke effect meshes
 --- @type table<string, niNode>
@@ -61,15 +64,9 @@ end
 
 ---@private
 ---@param light tes3reference
----@param offsets tes3vector3[]?
-function EffectManager:spawnSmokeVFX(light, offsets)
-	if not offsets then
-		log:info("No smoke offsets for %q.", light.mesh)
-		return false
-	end
-
+function EffectManager:spawnSmokeVFX(light)
 	for node in table.traverse({ light.sceneNode }) do
-		if node.name == parentNodeName then
+		if parentNodeName[node.name] then
 			local path = string.format(BASEPATH, self:incrementPhase())
 			local effect = loadedEffect[path]
 			if not effect then
@@ -102,10 +99,9 @@ function EffectManager:applyCandleSmokeEffect(reference)
 	if self.activeEffects[reference] then
 		return false
 	end
-	local light = reference.object --[[@as tes3light]]
-	local mesh = util.sanitizeMesh(light.mesh)
-	local offsets = smokeOffset[mesh]
-	return self:spawnSmokeVFX(reference, offsets)
+
+	self:spawnSmokeVFX(reference)
+	return true
 end
 
 ---@private
