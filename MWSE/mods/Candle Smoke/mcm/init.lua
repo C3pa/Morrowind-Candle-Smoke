@@ -57,24 +57,14 @@ local function registerModConfig()
 		label = i18n("mcm.smokeIntensity.label"),
 		description = i18n("mcm.smokeIntensity.description"),
 		decimalPlaces = 2,
+		min = 0.01,
 		max = 1.0,
-		jump = 0.01,
-		configKey = "alpha",
+		step = 0.05,
+		jump = 0.1,
+		configKey = "intensity",
 		callback = function(self)
-			event.trigger("CandleSmoke:AlphaChanged", { alpha = self.variable.value })
+			event.trigger("Candle Smoke: intensity updated", { newIntensity = self.variable.value })
 		end
-	})
-
-	page:createDropdown({
-		label = i18n("mcm.smokeIntensity.label"),
-		description = i18n("mcm.smokeIntensity.description"),
-		options = {
-			{ label = i18n("mcm.smokeIntensity.Very faint"), value = 30 },
-			{ label = i18n("mcm.smokeIntensity.Faint"), value = 45 },
-			{ label = i18n("mcm.smokeIntensity.Medium"), value = 60 },
-			{ label = i18n("mcm.smokeIntensity.Dense"), value = 90 },
-		},
-		configKey = "smokeIntensity",
 	})
 
 	page:createYesNoButton({

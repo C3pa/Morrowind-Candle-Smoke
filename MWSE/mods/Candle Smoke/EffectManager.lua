@@ -1,29 +1,18 @@
 local inspect = require("inspect")
 
 local Class = require("Candle Smoke.Class")
-local config = require("Candle Smoke.config")
 local smokeOffset = require("Candle Smoke.data").smokeOffset
 local util = require("Candle Smoke.util")
 
 
 local log = mwse.Logger.new()
-
--- TODO: try programatically making smoke more/less apparent
---[[
-https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Ashfall%20-%20A%20Camping%20Survival%20and%20Needs%20Mod/Ashfall-49057-3-19-2-1733802884/Data%20Files/MWSE/mods/mer/ashfall/camping/campfire/campfireVisuals.lua#L280
-https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Inspect%20It/Inspect%20It-54636-1-7-1725378854/Data%20Files/MWSE/mods/InspectIt/controller/inspector.lua#L715
-https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Magicka%20Expanded/Magicka%20Expanded-47111-3-0-3-1719837299/00%20-%20Framework/MWSE/lib/OperatorJack/MagickaExpanded/vfx/nodes/decals.lua#L59
-https://github.com/MWSE/morrowind-nexus-lua-dump/blob/0ec7575de78744996ffb1df4400313fc934d5556/lua/Highlighter/Highlighter-55620-0-1-1734782876/Data%20Files/MWSE/mods/Highlighter/main.lua#L8
-
---]]
-
-
-local BASEPATH = "e\\taitech\\candlesmoke%d_%d.nif"
+local BASEPATH = "e\\taitech\\candlesmoke_%d.nif"
 local OFFSET = tes3vector3.new(0, 0, -2)
+local parentNodeName = "CandleFlame Emitter"
 
 -- A cache of loaded smoke effect meshes
 --- @type table<string, niNode>
-local smokeEffects = {}
+local loadedEffect = {}
 
 
 ---@class CandleSmoke.EffectManager
@@ -43,6 +32,7 @@ function EffectManager:new()
 	return t
 end
 
+--- Used to keep track of which smoke asset (of the 3 available) to spawn.
 ---@private
 ---@return integer newPhase
 function EffectManager:incrementPhase()
@@ -53,81 +43,57 @@ function EffectManager:incrementPhase()
 	return self.phase
 end
 
----@private
----@param node niNode
----@param newAlpha number
-function EffectManager:setNodeMaterialAlpha(node, newAlpha)
-	-- -@param node niObjectNET
-	-- for node in table.traverse({ node }) do
-	-- 	if node:isInstanceOfType(ni.type.NiTriShape) then
-	-- 		log:debug("Changing color of %s", node.name)
-	-- 		---@cast node niTriShape
-	-- 		local material = node:detachProperty(ni.propertyType.material):clone() --[[@as niMaterialProperty]]
-	-- 		material.alpha = newAlpha
-	-- 		node:attachProperty(material)
-	-- 		node:updateProperties()
-	-- 	end
-	-- end
-end
+---@param color mwseColorTable
+function EffectManager:updateEffectMaterial(color)
+	-- Update the color of the already spawned vfx.
+	for light, effects in pairs(self.activeEffects) do
+		for _, effect in ipairs(effects) do
+			util.updateNodeEmissive(effect, color)
+		end
+		util.updateNode(light.sceneNode)
+	end
 
----@param newAlpha number
-function EffectManager:updateEffectMaterial(newAlpha)
-	log:debug("Setting new alpha to: %s", newAlpha)
-	-- for _, effects in pairs(self.activeEffects) do
-	-- 	for _, effect in pairs(effects) do
-	-- 		self:setNodeMaterialAlpha(effect, newAlpha)
-	-- 	end
-	-- end
-	-- -- Also update cached smoke effects
-	-- for _, effect in pairs(smokeEffects) do
-	-- 	self:setNodeMaterialAlpha(effect, newAlpha)
-	-- end
-	-- util.updateVFXRoot()
+	-- Update the color of the loaded vfx.
+	for _, effect in pairs(loadedEffect) do
+		util.updateNodeEmissive(effect, color)
+	end
 end
 
 ---@private
 ---@param light tes3reference
 ---@param offsets tes3vector3[]?
----@param updateRoot boolean?
-function EffectManager:spawnSmokeVFX(light, offsets, updateRoot)
+function EffectManager:spawnSmokeVFX(light, offsets)
 	if not offsets then
 		log:info("No smoke offsets for %q.", light.mesh)
 		return false
 	end
-	local origin = light.position:copy()
-	local root = tes3.worldController.vfxManager.worldVFXRoot
 
-	for _, offset in ipairs(offsets) do
-		local rotation = tes3matrix33.new()
-		rotation:fromEulerXYZ(light.orientation.x, light.orientation.y, light.orientation.z)
-		local position = rotation * (offset + OFFSET) + origin
-		log:debug("Spawning vfx for %q at %s.", light.id, position)
-
-		local path = string.format(BASEPATH, config.smokeIntensity, self:incrementPhase())
-		local effect = smokeEffects[path]
-		if not effect then
-			smokeEffects[path] = tes3.loadMesh(path) --[[@as niNode]]
-			effect = smokeEffects[path]
-			effect.name = path
-			self:setNodeMaterialAlpha(effect, config.alpha)--util.getSmokeEmissiveColor())
+	for node in table.traverse({ light.sceneNode }) do
+		if node.name == parentNodeName then
+			local path = string.format(BASEPATH, self:incrementPhase())
+			local effect = loadedEffect[path]
+			if not effect then
+				loadedEffect[path] = tes3.loadMesh(path) --[[@as niNode]]
+				effect = loadedEffect[path]
+				effect.name = path
+				-- Update loaded emissive color to the currently selected value.
+				util.updateNodeEmissive(effect, util.getEmissiveColorFromConfig())
+			end
+			effect = effect:clone() --[[@as niNode]]
+			effect.translation = OFFSET:copy()
+			node:attachChild(effect)
+			if not self.activeEffects[light] then
+				self.activeEffects[light] = {}
+			end
+			table.insert(self.activeEffects[light], effect)
 		end
-
-		effect = effect:clone() --[[@as niNode]]
-		effect.translation = position
-		root:attachChild(effect)
-		if not self.activeEffects[light] then
-			self.activeEffects[light] = {}
-		end
-		table.insert(self.activeEffects[light], effect)
 	end
-	if not updateRoot then return end
-	util.updateVFXRoot()
+	util.updateNode(light.sceneNode)
 end
 
 ---@param reference tes3reference
----@param updateRoot boolean?
 ---@return boolean spawnedSmoke
-function EffectManager:applyCandleSmokeEffect(reference, updateRoot)
+function EffectManager:applyCandleSmokeEffect(reference)
 	if not util.isLanternValid(reference) then
 		return false
 	end
@@ -139,7 +105,7 @@ function EffectManager:applyCandleSmokeEffect(reference, updateRoot)
 	local light = reference.object --[[@as tes3light]]
 	local mesh = util.sanitizeMesh(light.mesh)
 	local offsets = smokeOffset[mesh]
-	return self:spawnSmokeVFX(reference, offsets, updateRoot)
+	return self:spawnSmokeVFX(reference, offsets)
 end
 
 ---@private
@@ -147,22 +113,19 @@ function EffectManager:applySmokeOnAllCandles()
 	for _, light in ipairs(util.getLights()) do
 		self:applyCandleSmokeEffect(light)
 	end
-	util.updateVFXRoot()
 end
 
 
 ---@param light tes3reference
----@param updateRoot boolean?
-function EffectManager:detachSmokeEffect(light, updateRoot)
+function EffectManager:detachSmokeEffect(light)
 	local effects = self.activeEffects[light]
 	if not effects then return end
 	log:debug("Detaching smoke from: %q.", light.id)
 	for _, effect in ipairs(effects) do
-		tes3.worldController.vfxManager.worldVFXRoot:detachChild(effect)
+		effect.parent:detachChild(effect)
 	end
+	util.updateNode(light.sceneNode)
 	self.activeEffects[light] = nil
-	if not updateRoot then return end
-	util.updateVFXRoot()
 end
 
 ---@private
@@ -170,7 +133,6 @@ function EffectManager:detachAllSmokeEffects()
 	for light, _ in pairs(self.activeEffects) do
 		self:detachSmokeEffect(light)
 	end
-	util.updateVFXRoot()
 end
 
 function EffectManager:onCellChanged()
@@ -180,12 +142,13 @@ function EffectManager:onCellChanged()
 end
 
 -- Apply smoke effect if the player dropped a candle
+-- TODO: remove
 ---@param e itemDroppedEventData
 function EffectManager:onItemDropped(e)
 	local ref = e.reference
 	local object = ref.object
 	if object.objectType ~= tes3.objectType.light then return end
-	self:applyCandleSmokeEffect(ref, true)
+	self:applyCandleSmokeEffect(ref)
 end
 
 return EffectManager

@@ -3,9 +3,26 @@ local smokeOffset = require("Candle Smoke.data").smokeOffset
 
 local util = {}
 
-function util.getSmokeEmissiveColor()
-	-- return niColor.new(config.smokeEmissive, config.smokeEmissive, config.smokeEmissive)
-	-- return { r = config.smokeEmissive, g = config.smokeEmissive, b = config.smokeEmissive }
+---@return mwseColorTable
+function util.getEmissiveColorFromConfig()
+	return {
+		r = config.intensity,
+		g = config.intensity,
+		b = config.intensity
+	}
+end
+
+---@param node niNode
+---@param color mwseColorTable
+function util.updateNodeEmissive(node, color)
+	---@param object niNode|niTriShape
+	for object in table.traverse({ node }) do
+		if object:isInstanceOfType(ni.type.NiTriShape) then
+			---@cast object niTriShape
+			local material = object.materialProperty
+			material.emissive = niColor.new(color.r, color.g, color.b)
+		end
+	end
 end
 
 function util.getLights()
@@ -67,10 +84,6 @@ function util.updateNode(node)
 	node:update()
 	node:updateEffects()
 	node:updateProperties()
-end
-
-function util.updateVFXRoot()
-	util.updateNode(tes3.worldController.vfxManager.worldVFXRoot)
 end
 
 -- Let's strip the beginning "l\"

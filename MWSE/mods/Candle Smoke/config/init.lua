@@ -6,8 +6,7 @@ local fileName = "Candle Smoke"
 ---@field fileName string
 local default = {
 	logLevel = mwse.logLevel.info,
-	smokeIntensity = 60,
-	alpha = 1.0,
+	intensity = 0.6,
 	disableCarriable = false,
 }
 
